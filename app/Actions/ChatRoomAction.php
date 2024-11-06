@@ -2,7 +2,6 @@
 
 namespace App\Actions;
 
-use App\Events\ChatroomUpdated;
 use App\Models\ChatRoom;
 
 class ChatRoomAction
@@ -10,8 +9,6 @@ class ChatRoomAction
     public function create(array $data)
     {
         $chatroom = Chatroom::create($data);
-
-        broadcast(new ChatroomUpdated($chatroom))->toOthers();
 
         return $chatroom;
     }
@@ -24,16 +21,12 @@ class ChatRoomAction
 
         $chatroom->users()->attach($userId);
 
-        broadcast(new ChatroomUpdated($chatroom))->toOthers();
-
         return $chatroom;
     }
 
     public function leave(Chatroom $chatroom, $userId): ChatRoom
     {
         $chatroom->users()->detach($userId);
-
-        broadcast(new ChatroomUpdated($chatroom))->toOthers();
 
         return $chatroom;
     }
