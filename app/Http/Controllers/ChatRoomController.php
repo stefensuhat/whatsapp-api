@@ -47,6 +47,10 @@ class ChatRoomController extends Controller
             auth()->id()
         );
 
+        if (! $chatroom) {
+            return response()->json(['message' => 'Chatroom is full'], 400);
+        }
+
         return response()->json($chatroom);
     }
 

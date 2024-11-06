@@ -3,6 +3,7 @@
 namespace App\Actions;
 
 use App\Models\ChatRoom;
+use App\Models\ChatRoomUser;
 
 class ChatRoomAction
 {
@@ -13,10 +14,18 @@ class ChatRoomAction
         return $chatroom;
     }
 
-    public function join(Chatroom $chatroom, $userId): ChatRoom
+    public function join(Chatroom $chatroom, $userId): ?ChatRoom
     {
+        if ($chatroom->users()->where('user_id', $userId)->exists()) {
+            return $chatroom;
+        }
+
         if ($chatroom->users()->count() >= $chatroom->max_members) {
-            throw new \Exception('Chatroom is full');
+            return null;
+        }
+
+        if ($checkExisting = ChatRoomUser::where('user_id', $userId)->first()) {
+            $checkExisting->users()->detach($userId);
         }
 
         $chatroom->users()->attach($userId);
