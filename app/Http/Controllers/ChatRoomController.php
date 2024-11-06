@@ -46,6 +46,7 @@ class ChatRoomController extends Controller
             Chatroom::findOrFail($id),
             auth()->id()
         );
+
         return response()->json($chatroom);
     }
 
@@ -55,6 +56,7 @@ class ChatRoomController extends Controller
             Chatroom::findOrFail($id),
             auth()->id()
         );
+
         return response()->json($chatroom);
     }
 }

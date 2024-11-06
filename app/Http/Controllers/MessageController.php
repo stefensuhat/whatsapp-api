@@ -17,11 +17,10 @@ class MessageController extends Controller
 
     public function index($chatroomId)
     {
-     return Message::where('chat_room_id', $chatroomId)
+        return Message::where('chat_room_id', $chatroomId)
             ->with('user')
             ->oldest()
             ->get();
-
 
     }
 

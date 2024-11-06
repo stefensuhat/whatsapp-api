@@ -22,5 +22,4 @@ class ChatRoom extends Model
             ->withTimestamps()
             ->withPivot('last_read_at');
     }
-
 }

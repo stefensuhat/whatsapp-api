@@ -12,7 +12,7 @@ class MessageAction
         $message = new Message([
             'content' => $data['content'] ?? null,
             'user_id' => $userId,
-            'chat_room_id' => $chatroomId
+            'chat_room_id' => $chatroomId,
         ]);
 
         if (isset($data['attachment'])) {

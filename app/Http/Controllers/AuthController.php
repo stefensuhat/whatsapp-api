@@ -12,7 +12,7 @@ class AuthController extends Controller
     {
         $user = User::where('username', $request->input('username'))->first();
 
-        if (!$user) {
+        if (! $user) {
             return response()->json(['message' => 'User not found'], 400);
         }
 
