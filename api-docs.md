@@ -1,17 +1,7 @@
 # WhatsApp Clone API Documentation
 
 ## Authentication
-### Register User
-```
-POST /api/register
-Content-Type: application/json
 
-{
-    "name": "string",
-    "email": "string",
-    "password": "string"
-}
-```
 
 ### Login
 ```
@@ -19,13 +9,19 @@ POST /api/login
 Content-Type: application/json
 
 {
-    "email": "string",
+    "username": "string",
     "password": "string"
 }
 
 Response:
 {
     "token": "string"
+    "user": {
+        "id": "string",
+        "username": "string",
+        "created_at": "string",
+        "updated_at": "string"
+    }
 }
 ```
 
@@ -41,7 +37,6 @@ Response:
         "id": integer,
         "name": "string",
         "max_members": integer,
-        "users_count": integer,
         "created_at": "timestamp",
         "updated_at": "timestamp"
     }
@@ -79,7 +74,6 @@ Response:
     "id": integer,
     "name": "string",
     "max_members": integer,
-    "users_count": integer
 }
 ```
 
@@ -93,7 +87,6 @@ Response:
     "id": integer,
     "name": "string",
     "max_members": integer,
-    "users_count": integer
 }
 ```
 
@@ -153,26 +146,40 @@ Response:
 
 ### Connect to Chatroom
 ```javascript
-const socket = new WebSocket('ws://your-domain/ws');
-socket.send(JSON.stringify({
-    type: 'join',
-    chatroomId: integer
-}));
-```
-
-### Message Received Event
-```javascript
-socket.onmessage = (event) => {
-    const message = JSON.parse(event.data);
-    // Handle new message
-};
+const echo = new Echo({
+    broadcaster: 'reverb',
+    key: import.meta.env.VITE_REVERB_APP_KEY,
+    wsHost: import.meta.env.VITE_REVERB_HOST,
+    wsPort: import.meta.env.VITE_REVERB_PORT ?? 80,
+    wssPort: import.meta.env.VITE_REVERB_PORT ?? 443,
+    forceTLS: (import.meta.env.VITE_REVERB_SCHEME ?? 'https') === 'https',
+    enabledTransports: ['ws', 'wss'],
+    // authEndpoint: `http://localhost:8000/broadcasting/auth`,
+    authorizer: (channel: { name: any }, _options: any) => {
+        return {
+            authorize: (socketId: any, callback: (arg0: boolean, arg1: AxiosResponse<any, any>) => void) => {
+                http
+                    .post('/broadcasting/auth', {
+                        socket_id: socketId,
+                        channel_name: channel.name,
+                    })
+                    .then((response) => {
+                        callback(false, response)
+                    })
+                    .catch((error) => {
+                        callback(true, error)
+                    })
+            },
+        }
+    },
+})
 ```
 
 ### Chatroom Updated Event
 ```javascript
 // Listen on 'chatrooms' channel for updates
-Echo.channel('chatrooms')
-    .listen('ChatroomUpdated', (e) => {
-        // Handle chatroom update
+Echo.channel('chatroom')
+    .listen('MessageSent', (e) => {
+        refetch()
     });
 ```
